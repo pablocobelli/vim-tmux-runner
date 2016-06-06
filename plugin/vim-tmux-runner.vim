@@ -46,10 +46,10 @@ function! s:ValidRunnerPaneSet()
         call s:EchoError("No runner pane attached.")
         return 0
     endif
-    if !s:ValidRunnerPaneNumber(s:runner_pane)
-        call s:EchoError("Runner pane setting (" . s:runner_pane . ") is invalid. Please reattach.")
-        return 0
-    endif
+    " if !s:ValidRunnerPaneNumber(s:runner_pane)
+        " call s:EchoError("Runner pane setting (" . s:runner_pane . ") is invalid. Please reattach.")
+        " return 0
+    " endif
     return 1
 endfunction
 
@@ -160,12 +160,13 @@ function! s:SendTmuxCommand(command)
     return s:Strip(system(prefixed_command))
 endfunction
 
-function! s:TargetedTmuxCommand(command, target_pane)
-    return a:command . " -t " . a:target_pane
+function! s:TargetedTmuxCommand(command, target_window, target_pane)
+    " return a:command . " -t " . a:target_pane
+    return a:command . " -t " . a:target_window . "." . a:target_pane
 endfunction
 
 function! s:_SendKeys(keys)
-    let targeted_cmd = s:TargetedTmuxCommand("send-keys", s:runner_pane)
+    let targeted_cmd = s:TargetedTmuxCommand("send-keys ", s:runner_window, s:runner_pane)
     let full_command = join([targeted_cmd, a:keys])
     call s:SendTmuxCommand(full_command)
 endfunction
@@ -253,9 +254,10 @@ function! s:PromptForRunnerToAttach()
     if g:VtrDisplayPaneNumbers
       call s:SendTmuxCommand('source ~/.tmux.conf && tmux display-panes')
     endif
+    echohl String | let desired_window = input('Session (# or name): ') | echohl None
     echohl String | let desired_pane = input('Pane #: ') | echohl None
     if desired_pane != ''
-      call s:AttachToPane(desired_pane)
+      call s:AttachToPane(desired_pane, desired_window)
     else
       call s:EchoError("No pane specified. Cancelling.")
     endif
@@ -269,16 +271,18 @@ function! s:CurrentMajorOrientation()
   return orientation_map[outermost_orientation]
 endfunction
 
-function! s:AttachToPane(desired_pane)
+function! s:AttachToPane(desired_pane, desired_window)
   let desired_pane = str2nr(a:desired_pane)
-  if s:ValidRunnerPaneNumber(desired_pane)
+  let desired_window = a:desired_window
+  " if s:ValidRunnerPaneNumber(desired_pane)
+    let s:runner_window = desired_window
     let s:runner_pane = desired_pane
     let s:vim_pane = s:ActivePaneIndex()
     let s:vtr_orientation = s:CurrentMajorOrientation()
-    echohl String | echo "\rRunner pane set to: " . desired_pane | echohl None
-  else
-    call s:EchoError("Invalid pane number: " . desired_pane)
-  endif
+    echohl String | echo "\rRunner pane set to: " . desired_window . "." . desired_pane | echohl None
+  " else
+    " call s:EchoError("Invalid pane number: " . desired_pane)
+  " endif
 endfunction
 
 function! s:EchoError(message)
@@ -394,7 +398,7 @@ function! s:SendTextToRunner(lines)
     if !s:ValidRunnerPaneSet() | return | endif
     let prepared = s:PrepareLines(a:lines)
     let joined_lines = join(prepared, "\r") . "\r"
-    let send_keys_cmd = s:TargetedTmuxCommand("send-keys", s:runner_pane)
+    let send_keys_cmd = s:TargetedTmuxCommand("send-keys", s:runner_window, s:runner_pane)
     let targeted_cmd = send_keys_cmd . ' ' . shellescape(joined_lines)
     call s:SendTmuxCommand(targeted_cmd)
 endfunction
