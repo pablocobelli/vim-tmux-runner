@@ -80,3 +80,16 @@ been added to provide additional control over the tmux runner pane.
 [short demo]: https://vimeo.com/126420226
 [Jack Franklin]: https://github.com/jackfranklin
 [Vim London]: http://www.meetup.com/Vim-London/
+
+Mods
+----
+
+Added possibility to interact with a different tmux session, addressing it
+either by name or number. 
+
+To do
+-----
+
+1. Pane validation has been disabled for testing purposes, this needs to be
+   extended to sessions as well.
+
