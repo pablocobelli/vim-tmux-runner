@@ -92,4 +92,6 @@ To do
 
 1. Pane validation has been disabled for testing purposes, this needs to be
    extended to sessions as well.
-
+1. Pane orientation-related functions have been disabled. 
+1. When prompted for pane to attach, make sure the pane numbers are shown 
+   for all open sessions.

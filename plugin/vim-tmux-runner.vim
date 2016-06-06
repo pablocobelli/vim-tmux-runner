@@ -248,20 +248,20 @@ function! s:AltPane()
 endfunction
 
 function! s:PromptForRunnerToAttach()
-  if s:PaneCount() == 2
-    call s:AttachToPane(s:AltPane())
-  else
-    if g:VtrDisplayPaneNumbers
-      call s:SendTmuxCommand('source ~/.tmux.conf && tmux display-panes')
-    endif
-    echohl String | let desired_window = input('Session (# or name): ') | echohl None
-    echohl String | let desired_pane = input('Pane #: ') | echohl None
-    if desired_pane != ''
-      call s:AttachToPane(desired_pane, desired_window)
-    else
-      call s:EchoError("No pane specified. Cancelling.")
-    endif
+  " if s:PaneCount() == 2
+    " call s:AttachToPane(s:AltPane())
+  " else
+  if g:VtrDisplayPaneNumbers
+    call s:SendTmuxCommand('source ~/.tmux.conf && tmux display-panes')
   endif
+  echohl String | let desired_window = input('Session (# or name): ') | echohl None
+  echohl String | let desired_pane = input('Pane #: ') | echohl None
+  if desired_pane != ''
+    call s:AttachToPane(desired_pane, desired_window)
+  else
+    call s:EchoError("No pane specified. Cancelling.")
+  endif
+  " endif
 endfunction
 
 function! s:CurrentMajorOrientation()
@@ -278,7 +278,7 @@ function! s:AttachToPane(desired_pane, desired_window)
     let s:runner_window = desired_window
     let s:runner_pane = desired_pane
     let s:vim_pane = s:ActivePaneIndex()
-    let s:vtr_orientation = s:CurrentMajorOrientation()
+    " let s:vtr_orientation = s:CurrentMajorOrientation()
     echohl String | echo "\rRunner pane set to: " . desired_window . "." . desired_pane | echohl None
   " else
     " call s:EchoError("Invalid pane number: " . desired_pane)
