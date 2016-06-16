@@ -251,9 +251,9 @@ function! s:PromptForRunnerToAttach()
   " if s:PaneCount() == 2
     " call s:AttachToPane(s:AltPane())
   " else
-  if g:VtrDisplayPaneNumbers
-    call s:SendTmuxCommand('source ~/.tmux.conf && tmux display-panes')
-  endif
+  " if g:VtrDisplayPaneNumbers
+    " call s:SendTmuxCommand('source ~/.tmux.conf && tmux display-panes')
+  " endif
   echohl String | let desired_window = input('Session (# or name): ') | echohl None
   echohl String | let desired_pane = input('Pane #: ') | echohl None
   if desired_pane != ''
