@@ -437,10 +437,18 @@ endfunction
 function! s:SendTextToRunner(lines)
     if !s:ValidRunnerPaneSet() | return | endif
     let prepared = s:PrepareLines(a:lines)
-    let joined_lines = join(prepared, "\r") . "\r"
+    " let joined_lines = join(prepared, "\r") . "\r"
     let send_keys_cmd = s:TargetedTmuxCommand("send-keys", s:runner_session, s:runner_window, s:runner_pane)
-    let targeted_cmd = send_keys_cmd . ' ' . shellescape(joined_lines)
-    call s:SendTmuxCommand(targeted_cmd)
+    " let targeted_cmd = send_keys_cmd . ' ' . shellescape(joined_lines)
+    " call s:SendTmuxCommand(targeted_cmd)
+    for linea in prepared
+        let targeted_cmd = send_keys_cmd . ' ' . shellescape(linea) . ' C-V' . ' C-J'
+        " call system('tmux ' .  targeted_cmd)
+        call s:SendTmuxCommand(targeted_cmd) 
+    endfor
+    " send 2 enters to execute, not just paste!
+    " this should be optional, it might be interesting to just paste and modify in place
+    call s:SendTmuxCommand(send_keys_cmd . ' Enter Enter ')
 endfunction
 
 function! s:SendCtrlD()
