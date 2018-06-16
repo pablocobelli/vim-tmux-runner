@@ -451,6 +451,22 @@ function! s:SendTextToRunner(lines)
     call s:SendTmuxCommand(send_keys_cmd . ' Enter Enter ')
 endfunction
 
+
+function! s:SendCellToRunner()
+    " store current cursor position
+    let save_pos = getpos(".")
+    " backward search for 'beginning of cell' mark
+    call search(g:VtrCellPatternIdentifier, 'b')
+    let start_line = line('.')
+    call search(g:VtrCellPatternIdentifier)
+    let stop_line = line('.')-1
+    " send those lines (except borders) via SendTextToRunner
+    call s:SendTextToRunner(getline(start_line, stop_line)) 
+    " put cursor back where it was
+    call setpos('.', save_pos)
+endfunction
+
+
 function! s:SendCtrlD()
   if !s:ValidRunnerPaneSet() | return | endif
   call s:SendKeys('')
@@ -505,6 +521,7 @@ function! s:DefineCommands()
     command! VtrFlushCommand call s:FlushCommand()
     command! VtrSendCtrlD call s:SendCtrlD()
     command! VtrAttachToPane call s:PromptForRunnerToAttach()
+    command! -bang VtrSendCellToRunner call s:SendCellToRunner()
 endfunction
 
 function! s:DefineKeymaps()
@@ -540,6 +557,7 @@ function! s:InitializeVariables()
     call s:InitVariable("g:VtrStripLeadingWhitespace", 1)
     call s:InitVariable("g:VtrClearEmptyLines", 1)
     call s:InitVariable("g:VtrAppendNewline", 0)
+    call s:InitVariable("g:VtrCellPatternIdentifier", '##')
     let s:vtr_percentage = g:VtrPercentage
     let s:vtr_orientation = g:VtrOrientation
 endfunction
