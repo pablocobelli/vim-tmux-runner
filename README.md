@@ -3,6 +3,11 @@ VTR [Vim Tmux Runner]
 
 A simple, vimscript only, command runner for sending commands from vim to tmux.
 
+
+Modifications from original
+---------------------------
+
+
 Usage
 -----
 
