@@ -448,7 +448,8 @@ function! s:SendTextToRunner(lines)
     endfor
     " send 2 enters to execute, not just paste!
     " this should be optional, it might be interesting to just paste and modify in place
-    call s:SendTmuxCommand(send_keys_cmd . ' Enter Enter ')
+    " call s:SendTmuxCommand(send_keys_cmd . ' Enter Enter ')
+    call s:SendTmuxCommand(send_keys_cmd . ' Enter ')
 endfunction
 
 
@@ -460,8 +461,12 @@ function! s:SendCellToRunner()
     let start_line = line('.')
     call search(g:VtrCellPatternIdentifier)
     let stop_line = line('.')-1
+    if l:stop_line == 0
+        let stop_line = line('$')
+    endif
     " send those lines (except borders) via SendTextToRunner
-    call s:SendTextToRunner(getline(start_line, stop_line)) 
+    " call s:SendTextToRunner(getline(start_line, stop_line)) 
+    call s:SendTextToRunner(filter(getline(start_line, stop_line), 'v:val !~# "^\s*$"'))
     " put cursor back where it was
     call setpos('.', save_pos)
 endfunction
